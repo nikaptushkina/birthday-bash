@@ -43,8 +43,8 @@ export const Balloon: React.FC<BalloonProps> = ({ id, color, size, onPop }) => {
               className="w-full h-[85%] rounded-[50%_50%_50%_50%_/_60%_60%_40%_40%] shadow-lg border-2 border-white/40"
               style={{ 
                 backgroundColor: color,
-                filter: 'brightness(1.05)',
-                boxShadow: `inset -10px -10px 20px rgba(0,0,0,0.1), 0 10px 25px ${color}66`
+                filter: 'brightness(1.18) saturate(1.15)',
+                boxShadow: `inset -10px -10px 20px rgba(0,0,0,0.1), 0 14px 30px ${color}AA`
               }}
             >
               {/* Highlight */}

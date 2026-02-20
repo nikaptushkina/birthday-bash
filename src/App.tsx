@@ -7,12 +7,12 @@ import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const BALLOON_COLORS = [
-  '#FBCFE8', // Pink
-  '#E9D5FF', // Purple
-  '#BAE6FD', // Blue
-  '#FDE68A', // Yellow
-  '#A7F3D0', // Green
-  '#FFEDD5', // Orange
+  '#FF4FA3', // Pink
+  '#B566FF', // Purple
+  '#3FA9FF', // Blue
+  '#FFD84A', // Yellow
+  '#38E39B', // Green
+  '#FF9F43', // Orange
 ];
 
 const TOTAL_BALLOONS = 20;
@@ -94,7 +94,6 @@ function App() {
     setScore(0);
     setBalloons([]);
     setIsCelebration(false);
-    spawnedCount.current = 0;
     balloonIdRef.current = 0;
   };
 
@@ -151,7 +150,7 @@ function App() {
                 <span className="text-primary-foreground drop-shadow-sm">Balloon Bash</span>
               </h1>
               <p className="text-lg text-muted-foreground mb-8">
-                Help Jenna celebrate by popping all 20 balloons! 🎈
+                Pop 20 balloons to celebrate Jenna's birthday!
               </p>
               <button
                 onClick={startGame}
