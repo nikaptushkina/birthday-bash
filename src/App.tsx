@@ -58,14 +58,14 @@ function App() {
       setTimeout(() => {
         setIsCelebration(true);
         confetti({
-          particleCount: 150,
+          particleCount: isMobile ? 80 : 150,          
           spread: 70,
           origin: { y: 0.6 },
           colors: BALLOON_COLORS
         });
       }, 500);
     }
-  }, [score]);
+  }, [score, isMobile]);
 
   const handlePop = (id: number, e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => {
     audioManager.playPop();
