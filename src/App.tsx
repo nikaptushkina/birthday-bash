@@ -62,7 +62,7 @@ function App() {
     }
   }, [score]);
 
-  const handlePop = (id: number, e: React.MouseEvent | React.TouchEvent) => {
+  const handlePop = (id: number, e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => {
     audioManager.playPop();
     setScore(s => s + 1);
     setBalloons(prev => prev.filter(b => b.id !== id));

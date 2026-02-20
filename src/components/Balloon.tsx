@@ -1,21 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface BalloonProps {
   id: number;
   color: string;
   size: number;
-  onPop: (id: number, e: React.MouseEvent | React.TouchEvent) => void;
+  onPop: (id: number, e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => void;
 }
 
 export const Balloon: React.FC<BalloonProps> = ({ id, color, size, onPop }) => {
   const [isPopped, setIsPopped] = useState(false);
+  const isPoppingRef = useRef(false);
   const [leftPosition] = useState(Math.random() * 85 + 7.5); // Stay away from extreme edges
   const [duration] = useState(Math.random() * 3 + 4); // Speed up slightly (4s to 7s)
   const [swayDelay] = useState(Math.random() * 2);
 
-  const handlePop = (e: React.MouseEvent | React.TouchEvent) => {
-    if (isPopped) return;
+  const handlePop = (e: React.PointerEvent) => {
+    if (isPopped || isPoppingRef.current) return;
+    isPoppingRef.current = true;
     setIsPopped(true);
     onPop(id, e);
   };
@@ -30,8 +32,7 @@ export const Balloon: React.FC<BalloonProps> = ({ id, color, size, onPop }) => {
           transition={{ duration, ease: 'linear' }}
           className="absolute cursor-pointer touch-none select-none"
           style={{ width: size, height: size * 1.2 }}
-          onClick={handlePop}
-          onTouchStart={handlePop}
+          onPointerDown={handlePop}
         >
           <motion.div
             animate={{ x: [0, 15, -15, 0], rotate: [0, 5, -5, 0] }}
@@ -43,8 +44,8 @@ export const Balloon: React.FC<BalloonProps> = ({ id, color, size, onPop }) => {
               className="w-full h-[85%] rounded-[50%_50%_50%_50%_/_60%_60%_40%_40%] shadow-lg border-2 border-white/40"
               style={{ 
                 backgroundColor: color,
-                filter: 'brightness(1.18) saturate(1.15)',
-                boxShadow: `inset -10px -10px 20px rgba(0,0,0,0.1), 0 14px 30px ${color}AA`
+                filter: 'brightness(1.1) saturate(1.05)',
+                boxShadow: `inset -8px -8px 16px rgba(0,0,0,0.08), 0 8px 18px ${color}55`
               }}
             >
               {/* Highlight */}
