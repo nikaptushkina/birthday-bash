@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 355 100% 99%;
+    --foreground: 330 20% 15%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 330 20% 15%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 330 20% 15%;
+    
+    --primary: 327 73% 90%;
+    --primary-foreground: 327 73% 25%;
+    
+    --secondary: 270 70% 92%;
+    --secondary-foreground: 270 70% 25%;
+    
+    --muted: 270 10% 96%;
+    --muted-foreground: 270 5% 45%;
+    
+    --accent: 199 89% 86%;
+    --accent-foreground: 199 89% 25%;
+    
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 330 10% 90%;
+    --input: 330 10% 90%;
+    --ring: 327 73% 90%;
+    
+    --radius: 1.5rem;
+
+    --font-sans: 'Manrope', sans-serif;
+    --font-display: 'DM Sans', sans-serif;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans overflow-hidden touch-none;
+    background-image: radial-gradient(circle at 50% 50%, hsl(var(--secondary) / 0.1), transparent 80%);
+  }
+}
+
+.balloon-sway {
+  animation: sway 3s ease-in-out infinite alternate;
+}
+
+@keyframes sway {
+  0% { transform: translateX(-15px) rotate(-5deg); }
+  100% { transform: translateX(15px) rotate(5deg); }
+}
+
+@keyframes pop {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.5; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+.pop-animation {
+  animation: pop 0.2s ease-out forwards;
+}
+
+.float-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(circle at 50% 50%, hsl(var(--secondary) / 0.2), transparent 70%);
+  filter: blur(60px);
+}
