@@ -40,8 +40,8 @@ function App() {
 
   useEffect(() => {
     if (!gameStarted || isCelebration) return;
-    const maxBalloonsOnScreen = isMobile ? 6 : 10;
-    const spawnIntervalMs = isMobile ? 1400 : 1000;
+    const maxBalloonsOnScreen = isMobile ? 4 : 10;
+    const spawnIntervalMs = isMobile ? 1700 : 1000;
 
 
     const interval = setInterval(() => {
@@ -77,8 +77,8 @@ function App() {
     const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
 
     confetti({
-      particleCount: 20,
-      spread: 40,
+      particleCount: isMobile ? 8 : 20,
+      spread: isMobile ? 30 : 40,
       origin: { 
         x: clientX / window.innerWidth,
         y: clientY / window.innerHeight 
@@ -86,7 +86,7 @@ function App() {
       colors: BALLOON_COLORS,
       disableForced3d: true,
       gravity: 0.8,
-      ticks: 100
+      ticks: isMobile ? 70 : 100
     });
   };
 
