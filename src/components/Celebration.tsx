@@ -57,7 +57,7 @@ export const Celebration: React.FC<CelebrationProps> = ({ onRestart }) => {
       </motion.div>
 
       <h1 className="text-4xl font-extrabold text-foreground mb-4 font-display">
-        Happy Birthday, Jenna! 🐱🎉
+        Happy Birthday, Jenna! 🐱
       </h1>
       
       <p className="text-lg text-muted-foreground leading-relaxed mb-8">

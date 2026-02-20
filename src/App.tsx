@@ -5,19 +5,21 @@ import { audioManager } from './lib/audio';
 import { Music, Music2, Trophy } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useIsMobile } from './hooks/use-mobile';
 
 const BALLOON_COLORS = [
-  '#FBCFE8', // Pink
-  '#E9D5FF', // Purple
-  '#BAE6FD', // Blue
-  '#FDE68A', // Yellow
-  '#A7F3D0', // Green
-  '#FFEDD5', // Orange
+  '#FF4FA3', // Pink
+  '#B566FF', // Purple
+  '#3FA9FF', // Blue
+  '#FFD84A', // Yellow
+  '#38E39B', // Green
+  '#FF9F43', // Orange
 ];
 
 const TOTAL_BALLOONS = 20;
 
 function App() {
+  const isMobile = useIsMobile();
   const [score, setScore] = useState(0);
   const [balloons, setBalloons] = useState<{ id: number; color: string; size: number }[]>([]);
   const [isCelebration, setIsCelebration] = useState(false);
@@ -38,15 +40,18 @@ function App() {
 
   useEffect(() => {
     if (!gameStarted || isCelebration) return;
+    const maxBalloonsOnScreen = isMobile ? 6 : 10;
+    const spawnIntervalMs = isMobile ? 1400 : 1000;
+
 
     const interval = setInterval(() => {
-      if (score < TOTAL_BALLOONS && balloons.length < 10) {
+      if (score < TOTAL_BALLOONS && balloons.length < maxBalloonsOnScreen) {
         spawnBalloon();
       }
-    }, 1000);
+    }, spawnIntervalMs);
 
     return () => clearInterval(interval);
-  }, [gameStarted, isCelebration, balloons.length, spawnBalloon, score]);
+  }, [gameStarted, isCelebration, balloons.length, spawnBalloon, score, isMobile]);
 
   useEffect(() => {
     if (score === TOTAL_BALLOONS) {
@@ -62,7 +67,7 @@ function App() {
     }
   }, [score]);
 
-  const handlePop = (id: number, e: React.MouseEvent | React.TouchEvent) => {
+  const handlePop = (id: number, e: React.MouseEvent | React.TouchEvent | React.PointerEvent) => {
     audioManager.playPop();
     setScore(s => s + 1);
     setBalloons(prev => prev.filter(b => b.id !== id));
@@ -94,7 +99,6 @@ function App() {
     setScore(0);
     setBalloons([]);
     setIsCelebration(false);
-    spawnedCount.current = 0;
     balloonIdRef.current = 0;
   };
 
@@ -151,7 +155,7 @@ function App() {
                 <span className="text-primary-foreground drop-shadow-sm">Balloon Bash</span>
               </h1>
               <p className="text-lg text-muted-foreground mb-8">
-                Help Jenna celebrate by popping all 20 balloons! 🎈
+                Pop 20 balloons to celebrate Jenna's birthday!
               </p>
               <button
                 onClick={startGame}
@@ -162,7 +166,7 @@ function App() {
             </motion.div>
           </div>
         ) : isCelebration ? (
-          <div className="h-full flex items-center justify-center p-4">
+          <div className="h-full flex items-start sm:items-center justify-center p-4 pt-6 sm:pt-4">
             <Celebration onRestart={restartGame} />
           </div>
         ) : (
