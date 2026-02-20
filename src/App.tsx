@@ -5,6 +5,7 @@ import { audioManager } from './lib/audio';
 import { Music, Music2, Trophy } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useIsMobile } from './hooks/use-mobile';
 
 const BALLOON_COLORS = [
   '#FF4FA3', // Pink
@@ -25,6 +26,8 @@ function App() {
   const [gameStarted, setGameStarted] = useState(false);
   
   const balloonIdRef = useRef(0);
+  const isMobile = useIsMobile();
+  const maxVisibleBalloons = isMobile ? 6 : 10;
 
   const spawnBalloon = useCallback(() => {
     if (score >= TOTAL_BALLOONS) return;
@@ -40,13 +43,13 @@ function App() {
     if (!gameStarted || isCelebration) return;
 
     const interval = setInterval(() => {
-      if (score < TOTAL_BALLOONS && balloons.length < 10) {
+      if (score < TOTAL_BALLOONS && balloons.length < maxVisibleBalloons) {
         spawnBalloon();
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [gameStarted, isCelebration, balloons.length, spawnBalloon, score]);
+  }, [gameStarted, isCelebration, balloons.length, spawnBalloon, score, maxVisibleBalloons]);
 
   useEffect(() => {
     if (score === TOTAL_BALLOONS) {
@@ -119,12 +122,7 @@ function App() {
                 <Trophy size={20} className="text-primary-foreground" />
               </div>
               <div>
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Balloons Popped</p>
-                <p className="text-2xl font-black text-foreground leading-none">
-                  {score} <span className="text-muted-foreground/50 text-lg">/ {TOTAL_BALLOONS}</span>
-                </p>
-              </div>
-            </div>
+@@ -129,62 +131,62 @@ function App() {
 
             <button 
               onClick={toggleMute}
@@ -161,7 +159,7 @@ function App() {
             </motion.div>
           </div>
         ) : isCelebration ? (
-          <div className="h-full flex items-center justify-center p-4">
+          <div className="h-full flex items-start md:items-center justify-center p-4 pt-6 overflow-y-auto">
             <Celebration onRestart={restartGame} />
           </div>
         ) : (
