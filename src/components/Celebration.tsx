@@ -11,7 +11,7 @@ export const Celebration: React.FC<CelebrationProps> = ({ onRestart }) => {
     <motion.div 
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="flex flex-col items-center justify-center p-8 bg-white/80 backdrop-blur-xl rounded-[3rem] shadow-2xl border border-white max-w-lg w-full text-center relative overflow-hidden"
+      className="flex flex-col items-center justify-center p-6 md:p-8 bg-white/80 backdrop-blur-xl rounded-[2.25rem] md:rounded-[3rem] shadow-2xl border border-white max-w-lg w-full text-center relative overflow-hidden"
     >
       {/* Background Hearts */}
       {[...Array(6)].map((_, i) => (
@@ -45,7 +45,7 @@ export const Celebration: React.FC<CelebrationProps> = ({ onRestart }) => {
         <img 
           src="https://v3b.fal.media/files/b/0a8f3105/i5EwPSE4aA9tsqhvPa6pE_RsUPESac.png" 
           alt="Cute Cat"
-          className="w-48 h-48 rounded-[2rem] object-cover border-8 border-primary shadow-xl"
+          className="w-36 h-36 md:w-48 md:h-48 rounded-[2rem] object-cover border-8 border-primary shadow-xl"
         />
         <motion.div 
           animate={{ scale: [1, 1.2, 1] }}
@@ -56,11 +56,11 @@ export const Celebration: React.FC<CelebrationProps> = ({ onRestart }) => {
         </motion.div>
       </motion.div>
 
-      <h1 className="text-4xl font-extrabold text-foreground mb-4 font-display">
+      <h1 className="text-3xl md:text-4xl font-extrabold text-foreground mb-3 md:mb-4 font-display">
         Happy Birthday, Jenna! 🐱
       </h1>
       
-      <p className="text-lg text-muted-foreground leading-relaxed mb-8">
+      <p className="text-base md:text-lg text-muted-foreground leading-relaxed mb-6 md:mb-8">
         Wishing you all the best on your special day!<br />
         May this year be filled with joy, love, and lots of purrs!
       </p>
