@@ -5,6 +5,7 @@ import { audioManager } from './lib/audio';
 import { Music, Music2, Trophy } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useIsMobile } from './hooks/use-mobile';
 
 const BALLOON_COLORS = [
   '#FF4FA3', // Pink
@@ -18,6 +19,7 @@ const BALLOON_COLORS = [
 const TOTAL_BALLOONS = 20;
 
 function App() {
+  const isMobile = useIsMobile();
   const [score, setScore] = useState(0);
   const [balloons, setBalloons] = useState<{ id: number; color: string; size: number }[]>([]);
   const [isCelebration, setIsCelebration] = useState(false);
@@ -38,15 +40,18 @@ function App() {
 
   useEffect(() => {
     if (!gameStarted || isCelebration) return;
+    const maxBalloonsOnScreen = isMobile ? 6 : 10;
+    const spawnIntervalMs = isMobile ? 1400 : 1000;
+
 
     const interval = setInterval(() => {
-      if (score < TOTAL_BALLOONS && balloons.length < 10) {
+      if (score < TOTAL_BALLOONS && balloons.length < maxBalloonsOnScreen) {
         spawnBalloon();
       }
-    }, 1000);
+    }, spawnIntervalMs);
 
     return () => clearInterval(interval);
-  }, [gameStarted, isCelebration, balloons.length, spawnBalloon, score]);
+  }, [gameStarted, isCelebration, balloons.length, spawnBalloon, score, isMobile]);
 
   useEffect(() => {
     if (score === TOTAL_BALLOONS) {
@@ -161,7 +166,7 @@ function App() {
             </motion.div>
           </div>
         ) : isCelebration ? (
-          <div className="h-full flex items-center justify-center p-4">
+          <div className="h-full flex items-start sm:items-center justify-center p-4 pt-6 sm:pt-4">
             <Celebration onRestart={restartGame} />
           </div>
         ) : (

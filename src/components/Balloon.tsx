@@ -26,7 +26,7 @@ export const Balloon: React.FC<BalloonProps> = ({ id, color, size, onPop }) => {
     <AnimatePresence>
       {!isPopped && (
         <motion.div
-          initial={{ y: '110vh', x: `${leftPosition}vw`, opacity: 0 }}
+          initial={{ y: '110vh', x: `${leftPosition}vw`, opacity: 1 }}          
           animate={{ y: '-20vh', opacity: 1 }}
           exit={{ scale: 2, opacity: 0, transition: { duration: 0.2 } }}
           transition={{ duration, ease: 'linear' }}
@@ -45,7 +45,6 @@ export const Balloon: React.FC<BalloonProps> = ({ id, color, size, onPop }) => {
               className="w-full h-[85%] rounded-[50%_50%_50%_50%_/_60%_60%_40%_40%] shadow-lg border-2 border-white/40"
               style={{ 
                 backgroundColor: color,
-                filter: 'brightness(1.1) saturate(1.05)',
                 boxShadow: `inset -8px -8px 16px rgba(0,0,0,0.08), 0 8px 18px ${color}55`
               }}
             >
