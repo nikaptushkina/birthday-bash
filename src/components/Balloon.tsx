@@ -17,7 +17,6 @@ export const Balloon: React.FC<BalloonProps> = ({ id, color, size, onPop }) => {
 
   const handlePop = (e: React.PointerEvent) => {
     if (isPopped || isPoppingRef.current) return;
-
     isPoppingRef.current = true;
     setIsPopped(true);
     onPop(id, e);
@@ -27,13 +26,14 @@ export const Balloon: React.FC<BalloonProps> = ({ id, color, size, onPop }) => {
     <AnimatePresence>
       {!isPopped && (
         <motion.div
-          initial={{ y: '110vh', x: `${leftPosition}vw`, opacity: 1 }}
+          initial={{ y: '110vh', x: `${leftPosition}vw`, opacity: 0 }}
           animate={{ y: '-20vh', opacity: 1 }}
           exit={{ scale: 2, opacity: 0, transition: { duration: 0.2 } }}
           transition={{ duration, ease: 'linear' }}
           className="absolute cursor-pointer touch-none select-none"
           style={{ width: size, height: size * 1.2 }}
-          onPointerDown={handlePop}
+          onClick={handlePop}
+          onTouchStart={handlePop}
         >
           <motion.div
             animate={{ x: [0, 15, -15, 0], rotate: [0, 5, -5, 0] }}
@@ -45,8 +45,8 @@ export const Balloon: React.FC<BalloonProps> = ({ id, color, size, onPop }) => {
               className="w-full h-[85%] rounded-[50%_50%_50%_50%_/_60%_60%_40%_40%] shadow-lg border-2 border-white/40"
               style={{ 
                 backgroundColor: color,
-                filter: 'none',
-                boxShadow: `inset -8px -8px 14px rgba(0,0,0,0.08), 0 8px 14px rgba(0,0,0,0.12)`
+                filter: 'brightness(1.1) saturate(1.05)',
+                boxShadow: `inset -8px -8px 16px rgba(0,0,0,0.08), 0 8px 18px ${color}55`
               }}
             >
               {/* Highlight */}
