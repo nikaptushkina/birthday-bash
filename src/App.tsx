@@ -19,6 +19,15 @@ const BALLOON_COLORS = [
 const TOTAL_BALLOONS = 20;
 const DEFAULT_IMAGE_URL = 'https://v3b.fal.media/files/b/0a8f3105/i5EwPSE4aA9tsqhvPa6pE_RsUPESac.png';
 
+const HERO_BALLOONS = [
+  { left: '2.5%', top: '8%', size: 74, color: BALLOON_COLORS[0], duration: 5.5, delay: 0.1, opacity: 0.6 },
+  { left: '7%', top: '47%', size: 60, color: BALLOON_COLORS[2], duration: 6.4, delay: 0.7, opacity: 0.52 },
+  { left: '3.5%', top: '79%', size: 67, color: BALLOON_COLORS[5], duration: 5.9, delay: 0.3, opacity: 0.58 },
+  { left: '93%', top: '16%', size: 72, color: BALLOON_COLORS[1], duration: 5.8, delay: 0.2, opacity: 0.62 },
+  { left: '89%', top: '56%', size: 63, color: BALLOON_COLORS[4], duration: 6.2, delay: 0.9, opacity: 0.54 },
+  { left: '94.5%', top: '86%', size: 56, color: BALLOON_COLORS[3], duration: 6.6, delay: 0.5, opacity: 0.5 },
+] as const;
+
 interface BirthdayCardConfig {
   recipientName: string;
   headline: string;
@@ -229,6 +238,27 @@ function App() {
     <div className="relative w-full h-screen bg-background overflow-hidden flex flex-col font-sans">
       <div className="float-bg" />
 
+      {!gameStarted && (
+        <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
+          {HERO_BALLOONS.map(balloon => (
+            <motion.div
+              key={`${balloon.left}-${balloon.top}`}
+              className="absolute"
+              style={{ left: balloon.left, top: balloon.top }}
+              animate={{ y: [0, -18, 0], x: [0, 8, 0], rotate: [-2, 2, -2] }}
+              transition={{ duration: balloon.duration, repeat: Infinity, ease: 'easeInOut', delay: balloon.delay }}
+            >
+              <div
+                className="relative rounded-[50%_50%_45%_45%] shadow-md"
+                style={{ width: balloon.size, height: balloon.size * 1.2, backgroundColor: balloon.color, opacity: balloon.opacity }}
+              >
+                <div className="absolute left-1/2 top-full h-10 w-px -translate-x-1/2 bg-foreground/25" />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
+
       <AnimatePresence>
         {gameStarted && !isCelebration && (
           <motion.div
@@ -260,7 +290,7 @@ function App() {
 
       <div className="flex-1 relative overflow-y-auto">
         {!gameStarted ? (
-          <div className="min-h-full flex flex-col items-center justify-center p-6 text-center">
+          <div className="min-h-full flex flex-col items-center justify-center p-6 text-center relative z-10">
            <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
