@@ -63,8 +63,12 @@ export const Celebration: React.FC<CelebrationProps> = ({ onRestart, cardConfig 
         </motion.div>
       </motion.div>
 
+      <p className="text-xl font-semibold text-muted-foreground mb-2">
+        Dear {cardConfig.recipientName},
+      </p>
+
       <h1 className="text-4xl font-extrabold text-foreground mb-4 font-display">
-        {cardConfig.headline}, {cardConfig.recipientName}! 🎉
+        {cardConfig.headline} 🎉
       </h1>
       
       <p className="text-lg text-muted-foreground leading-relaxed whitespace-pre-line mb-8">{cardConfig.message}</p>
