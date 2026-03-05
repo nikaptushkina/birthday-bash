@@ -33,48 +33,71 @@ const defaultCardConfig: BirthdayCardConfig = {
   imageUrl: DEFAULT_IMAGE_URL,
 };
 
+interface CompactCardConfig {
+  r?: string;
+  h?: string;
+  m?: string;
+  i?: string;
+}
+
 const encodeCardConfig = (config: BirthdayCardConfig): string => {
-  const json = JSON.stringify(config);
-  const bytes = new TextEncoder().encode(json);
-  let binary = '';
+  const compact: CompactCardConfig = {};
 
-  bytes.forEach(byte => {
-    binary += String.fromCharCode(byte);
-  });
+  if (config.recipientName !== defaultCardConfig.recipientName) compact.r = config.recipientName;
+  if (config.headline !== defaultCardConfig.headline) compact.h = config.headline;
+  if (config.message !== defaultCardConfig.message) compact.m = config.message;
+  if (config.imageUrl !== defaultCardConfig.imageUrl) compact.i = config.imageUrl;
 
-  return window
-    .btoa(binary)
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/g, '');
+  return encodeURIComponent(JSON.stringify(compact));
 };
 
 const decodeCardConfig = (encodedData: string): BirthdayCardConfig | null => {
   try {
-    const base64 = encodedData.replace(/-/g, '+').replace(/_/g, '/');
-    const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
-    const binary = window.atob(padded);
-    const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
-    const parsed = JSON.parse(new TextDecoder().decode(bytes)) as Partial<BirthdayCardConfig>;
+    const parsed = JSON.parse(decodeURIComponent(encodedData)) as CompactCardConfig;
 
     return {
-      recipientName: parsed.recipientName || defaultCardConfig.recipientName,
-      headline: parsed.headline || defaultCardConfig.headline,
-      message: parsed.message || defaultCardConfig.message,
-      imageUrl: parsed.imageUrl || defaultCardConfig.imageUrl,
+      recipientName: parsed.r || defaultCardConfig.recipientName,
+      headline: parsed.h || defaultCardConfig.headline,
+      message: parsed.m || defaultCardConfig.message,
+      imageUrl: parsed.i || defaultCardConfig.imageUrl,
     };
   } catch {
-    return null;
+    try {
+      const base64 = encodedData.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
+      const binary = window.atob(padded);
+      const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+      const parsed = JSON.parse(new TextDecoder().decode(bytes)) as Partial<BirthdayCardConfig>;
+
+      return {
+        recipientName: parsed.recipientName || defaultCardConfig.recipientName,
+        headline: parsed.headline || defaultCardConfig.headline,
+        message: parsed.message || defaultCardConfig.message,
+        imageUrl: parsed.imageUrl || defaultCardConfig.imageUrl,
+      };
+    } catch {
+      return null;
+    }
   }
 };
 
-const decodeConfigFromUrl = (): BirthdayCardConfig | null => {
+const decodeConfigFromUrl = (): { cardConfig: BirthdayCardConfig; isSharedView: boolean } => {
   const params = new URLSearchParams(window.location.search);
   const encodedData = params.get('card');
 
-  if (!encodedData) return null;
+  if (!encodedData) {
+    return {
+      cardConfig: defaultCardConfig,
+      isSharedView: false,
+    };
+  }
 
-  return decodeCardConfig(encodedData);
+  const cardConfig = decodeCardConfig(encodedData);
+
+  return {
+    cardConfig: cardConfig || defaultCardConfig,
+    isSharedView: Boolean(cardConfig),
+  };
 };
 
 function App() {
@@ -84,11 +107,13 @@ function App() {
   const [isCelebration, setIsCelebration] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
+  const initialConfigRef = useRef(decodeConfigFromUrl());
+  const [isSharedView] = useState(initialConfigRef.current.isSharedView);
   
   const balloonIdRef = useRef(0);
   const [shareLink, setShareLink] = useState('');
   const [shareFeedback, setShareFeedback] = useState('');
-  const [cardConfig, setCardConfig] = useState<BirthdayCardConfig>(() => decodeConfigFromUrl() || defaultCardConfig);
+  const [cardConfig, setCardConfig] = useState<BirthdayCardConfig>(initialConfigRef.current.cardConfig);
 
   const spawnBalloon = useCallback(() => {
     if (score >= TOTAL_BALLOONS) return;
@@ -245,90 +270,95 @@ function App() {
                 {cardConfig.recipientName}&apos;s <br />
                 <span className="text-primary-foreground drop-shadow-sm">Balloon Bash</span>
               </h1>
-              <p className="text-lg text-muted-foreground mb-8">Customize this birthday game, share your link, and send it to your friend.</p>
+              <p className="text-lg text-muted-foreground mb-8">
+                {isSharedView
+                  ? 'A birthday game was shared with you. Pop all balloons to reveal the message 🎈'
+                  : 'Customize this birthday game, share your link, and send it to your friend.'}
+              </p>
 
-              <div className="bg-white/70 backdrop-blur-md border border-white rounded-3xl p-6 text-left shadow-xl mb-6 space-y-4">
-                <h2 className="font-bold text-xl">Customize this birthday card</h2>
+              {!isSharedView && (
+                <div className="bg-white/70 backdrop-blur-md border border-white rounded-3xl p-6 text-left shadow-xl mb-6 space-y-4">
+                  <h2 className="font-bold text-xl">Customize this birthday card</h2>
 
-                <label className="block">
-                  <span className="text-sm font-semibold text-muted-foreground">Birthday person&apos;s name</span>
-                  <input
-                    value={cardConfig.recipientName}
-                    onChange={e => updateCardConfig('recipientName', e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-primary/20 bg-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
-                    placeholder="Friend"
-                  />
-                </label>
+                  <label className="block">
+                    <span className="text-sm font-semibold text-muted-foreground">Birthday person&apos;s name</span>
+                    <input
+                      value={cardConfig.recipientName}
+                      onChange={e => updateCardConfig('recipientName', e.target.value)}
+                      className="mt-1 w-full rounded-xl border border-primary/20 bg-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      placeholder="Jenna"
+                    />
+                  </label>
 
-                <label className="block">
-                  <span className="text-sm font-semibold text-muted-foreground">Celebration title</span>
-                  <input
-                    value={cardConfig.headline}
-                    onChange={e => updateCardConfig('headline', e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-primary/20 bg-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
-                    placeholder="Happy Birthday"
-                  />
-                </label>
+                  <label className="block">
+                    <span className="text-sm font-semibold text-muted-foreground">Celebration title</span>
+                    <input
+                      value={cardConfig.headline}
+                      onChange={e => updateCardConfig('headline', e.target.value)}
+                      className="mt-1 w-full rounded-xl border border-primary/20 bg-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      placeholder="Happy Birthday"
+                    />
+                  </label>
 
-                <label className="block">
-                  <span className="text-sm font-semibold text-muted-foreground">Birthday message</span>
-                  <textarea
-                    value={cardConfig.message}
-                    onChange={e => updateCardConfig('message', e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-primary/20 bg-white px-4 py-2 h-24 resize-none focus:outline-none focus:ring-2 focus:ring-primary/40"
-                    placeholder="Write your custom message here"
-                  />
-                </label>
+                  <label className="block">
+                    <span className="text-sm font-semibold text-muted-foreground">Birthday message</span>
+                    <textarea
+                      value={cardConfig.message}
+                      onChange={e => updateCardConfig('message', e.target.value)}
+                      className="mt-1 w-full rounded-xl border border-primary/20 bg-white px-4 py-2 h-24 resize-none focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      placeholder="Write your custom message here"
+                    />
+                  </label>
 
-                <label className="block">
-                  <span className="text-sm font-semibold text-muted-foreground">Photo URL (optional)</span>
-                  <input
-                    value={cardConfig.imageUrl}
-                    onChange={e => updateCardConfig('imageUrl', e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-primary/20 bg-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
-                    placeholder="https://..."
-                  />
-                </label>
+                  <label className="block">
+                    <span className="text-sm font-semibold text-muted-foreground">Photo URL (optional)</span>
+                    <input
+                      value={cardConfig.imageUrl}
+                      onChange={e => updateCardConfig('imageUrl', e.target.value)}
+                      className="mt-1 w-full rounded-xl border border-primary/20 bg-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
+                      placeholder="https://..."
+                    />
+                  </label>
 
-                <label className="block">
-                  <span className="text-sm font-semibold text-muted-foreground">Or upload a photo</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="mt-1 w-full rounded-xl border border-primary/20 bg-white px-3 py-2 file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-1 file:text-primary-foreground"
-                  />
-                </label>
+                  <label className="block">
+                    <span className="text-sm font-semibold text-muted-foreground">Or upload a photo</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="mt-1 w-full rounded-xl border border-primary/20 bg-white px-3 py-2 file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-1 file:text-primary-foreground"
+                    />
+                  </label>
 
-                <div className="rounded-2xl bg-background/70 border border-primary/20 p-4">
-                  <p className="text-sm font-semibold text-muted-foreground mb-3">Current photo preview (default shown automatically)</p>
-                  <img
-                    src={cardConfig.imageUrl || DEFAULT_IMAGE_URL}
-                    alt="Birthday preview"
-                    onError={event => {
-                      event.currentTarget.src = DEFAULT_IMAGE_URL;
-                    }}
-                    className="w-28 h-28 rounded-2xl object-cover border-4 border-primary shadow"
-                  />
-                </div>
+                  <div className="rounded-2xl bg-background/70 border border-primary/20 p-4">
+                    <p className="text-sm font-semibold text-muted-foreground mb-3">Current photo preview (default shown automatically)</p>
+                    <img
+                      src={cardConfig.imageUrl || DEFAULT_IMAGE_URL}
+                      alt="Birthday preview"
+                      onError={event => {
+                        event.currentTarget.src = DEFAULT_IMAGE_URL;
+                      }}
+                      className="w-28 h-28 rounded-2xl object-cover border-4 border-primary shadow"
+                    />
+                  </div> 
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <button
+                      onClick={generateShareLink}
+                      className="inline-flex items-center justify-center gap-2 bg-accent hover:bg-accent/90 text-accent-foreground px-5 py-3 rounded-full font-semibold shadow"
+                    >
+                      <Link2 size={18} /> Generate share link
+                    </button>
 
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <button
-                    onClick={generateShareLink}
-                    className="inline-flex items-center justify-center gap-2 bg-accent hover:bg-accent/90 text-accent-foreground px-5 py-3 rounded-full font-semibold shadow"
-                  >
-                    <Link2 size={18} /> Generate share link
-                  </button>
-
-                  {shareFeedback && <p className="text-sm text-muted-foreground">{shareFeedback}</p>}
-                </div>
-
-                {shareLink && (
-                  <div className="rounded-2xl bg-background/70 border border-primary/20 p-3 break-all text-sm">
-                    {shareLink}
+                    {shareFeedback && <p className="text-sm text-muted-foreground">{shareFeedback}</p>}
                   </div>
-                )}
-              </div>
+
+                  {shareLink && (
+                    <div className="rounded-2xl bg-background/70 border border-primary/20 p-3 break-all text-sm">
+                      {shareLink}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <button
                 onClick={startGame}
