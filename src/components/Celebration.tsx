@@ -1,34 +1,41 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { PartyPopper, Heart, Music, Music2 } from 'lucide-react';
+import { PartyPopper, Heart } from 'lucide-react';
+
+interface BirthdayCardConfig {
+  recipientName: string;
+  headline: string;
+  message: string;
+  imageUrl: string;
+}
 
 interface CelebrationProps {
   onRestart: () => void;
+  cardConfig: BirthdayCardConfig;
 }
 
-export const Celebration: React.FC<CelebrationProps> = ({ onRestart }) => {
+export const Celebration: React.FC<CelebrationProps> = ({ onRestart, cardConfig }) => {
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       className="flex flex-col items-center justify-center p-8 bg-white/80 backdrop-blur-xl rounded-[3rem] shadow-2xl border border-white max-w-lg w-full text-center relative overflow-hidden"
     >
-      {/* Background Hearts */}
       {[...Array(6)].map((_, i) => (
         <motion.div
           key={i}
-          animate={{ 
+          animate={{
             y: [0, -20, 0],
             scale: [1, 1.2, 1],
-            opacity: [0.3, 0.6, 0.3]
+            opacity: [0.3, 0.6, 0.3],
           }}
-          transition={{ 
+          transition={{
             duration: 3 + Math.random() * 2,
             repeat: Infinity,
-            delay: i * 0.5
+            delay: i * 0.5,
           }}
           className="absolute text-primary/20"
-          style={{ 
+          style={{
             top: `${Math.random() * 100}%`,
             left: `${Math.random() * 100}%`,
           }}
@@ -42,12 +49,12 @@ export const Celebration: React.FC<CelebrationProps> = ({ onRestart }) => {
         transition={{ duration: 4, repeat: Infinity }}
         className="mb-6 relative"
       >
-        <img 
-          src="https://v3b.fal.media/files/b/0a8f3105/i5EwPSE4aA9tsqhvPa6pE_RsUPESac.png" 
-          alt="Cute Cat"
+        <img
+          src={cardConfig.imageUrl}
+          alt={`Birthday for ${cardConfig.recipientName}`}
           className="w-48 h-48 rounded-[2rem] object-cover border-8 border-primary shadow-xl"
         />
-        <motion.div 
+        <motion.div
           animate={{ scale: [1, 1.2, 1] }}
           transition={{ duration: 2, repeat: Infinity }}
           className="absolute -top-4 -right-4 bg-accent p-3 rounded-full shadow-lg"
@@ -57,13 +64,10 @@ export const Celebration: React.FC<CelebrationProps> = ({ onRestart }) => {
       </motion.div>
 
       <h1 className="text-4xl font-extrabold text-foreground mb-4 font-display">
-        Happy Birthday, Jenna! 🐱
+        {cardConfig.headline}, {cardConfig.recipientName}! 🎉
       </h1>
       
-      <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-        Wishing you all the best on your special day!<br />
-        May this year be filled with joy, love, and lots of purrs!
-      </p>
+      <p className="text-lg text-muted-foreground leading-relaxed whitespace-pre-line mb-8">{cardConfig.message}</p>
 
       <motion.button
         whileHover={{ scale: 1.05 }}
