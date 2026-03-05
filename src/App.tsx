@@ -113,7 +113,6 @@ function App() {
   const balloonIdRef = useRef(0);
   const [shareLink, setShareLink] = useState('');
   const [shareFeedback, setShareFeedback] = useState('');
-  const [hasUploadedImage, setHasUploadedImage] = useState(false);
   const [cardConfig, setCardConfig] = useState<BirthdayCardConfig>(initialConfigRef.current.cardConfig);
 
   const spawnBalloon = useCallback(() => {
@@ -199,43 +198,17 @@ function App() {
     setShareFeedback('');
   };
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        setHasUploadedImage(true);
-        updateCardConfig('imageUrl', reader.result);
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
   const generateShareLink = async () => {
-    const configForShare = cardConfig.imageUrl.startsWith('data:')
-      ? { ...cardConfig, imageUrl: defaultCardConfig.imageUrl }
-      : cardConfig;
-
-    const encodedConfig = encodeCardConfig(configForShare);
+    const encodedConfig = encodeCardConfig(cardConfig);
     const generatedLink = `${window.location.origin}${window.location.pathname}?card=${encodedConfig}`;
 
     setShareLink(generatedLink);
 
     try {
       await navigator.clipboard.writeText(generatedLink);
-      setShareFeedback(
-        cardConfig.imageUrl.startsWith('data:')
-          ? 'Share link copied! Uploaded files are local only, so the default photo is used in this link. Add a Photo URL to share your own image.'
-          : 'Share link copied! Send it to your friend 🎉'
-      );
+      setShareFeedback('Share link copied! Send it to your friend 🎉');
     } catch {
-      setShareFeedback(
-        cardConfig.imageUrl.startsWith('data:')
-          ? 'Share link ready below. Uploaded files are local only; add a Photo URL if you want to share a custom image.'
-          : 'Share link ready below. Copy it and send it 🎈'
-      );
+      setShareFeedback('Share link ready below. Copy it and send it 🎈');
     }
   };
 
@@ -291,11 +264,11 @@ function App() {
               </p>
 
               {!isSharedView && (
-                <div className="bg-background/80 border border-primary/20 rounded-3xl p-5 text-left mb-6 shadow-sm">
+                <div className="bg-background/80 border border-primary/35 rounded-3xl p-5 text-left mb-6 shadow-sm">
                   <h2 className="font-bold text-lg mb-2">How Balloon Bash works</h2>
                   <ol className="list-decimal pl-5 space-y-1 text-sm text-muted-foreground">
                     <li>Personalize the name, title, and birthday message.</li>
-                    <li>Add a photo URL (best for sharing) or upload a photo for local preview.</li>
+                    <li>Add a photo URL for the birthday image.</li>
                     <li>Generate a link and send it to your friend.</li>
                     <li>They pop all balloons to unlock your surprise message 🎉</li>
                   </ol>
@@ -340,30 +313,11 @@ function App() {
                     <span className="text-sm font-semibold text-muted-foreground">Photo URL (optional)</span>
                     <input
                       value={cardConfig.imageUrl}
-                      onChange={e => {
-                        setHasUploadedImage(false);
-                        updateCardConfig('imageUrl', e.target.value);
-                      }}
+                      onChange={e => updateCardConfig('imageUrl', e.target.value)}
                       className="mt-1 w-full rounded-xl border border-primary/20 bg-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/40"
                       placeholder="https://..."
                     />
                   </label>
-
-                  <label className="block">
-                    <span className="text-sm font-semibold text-muted-foreground">Or upload a photo</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="mt-1 w-full rounded-xl border border-primary/20 bg-white px-3 py-2 file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-1 file:text-primary-foreground"
-                    />
-                  </label>
-
-                  {hasUploadedImage && (
-                    <p className="text-xs text-muted-foreground">
-                      Uploaded images stay on your device. To share a custom photo, paste a public Photo URL above.
-                    </p>
-                  )}
 
                   <div className="rounded-2xl bg-background/70 border border-primary/20 p-4">
                     <p className="text-sm font-semibold text-muted-foreground mb-3">Current photo preview (default shown automatically)</p>
