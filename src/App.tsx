@@ -33,6 +33,13 @@ const defaultCardConfig: BirthdayCardConfig = {
   imageUrl: DEFAULT_IMAGE_URL,
 };
 
+const exampleCardConfig: BirthdayCardConfig = {
+  recipientName: 'Avery',
+  headline: 'Happy Birthday, Superstar!',
+  message: 'Hope your day is full of cake, laughter, and surprises!\nYou did it — all balloons popped 🎉',
+  imageUrl: DEFAULT_IMAGE_URL,
+};
+
 interface CompactCardConfig {
   r?: string;
   h?: string;
@@ -193,6 +200,12 @@ function App() {
     setGameStarted(true);
   };
 
+  const playExampleGame = () => {
+    setCardConfig(exampleCardConfig);
+    audioManager.init();
+    setGameStarted(true);
+  };
+
     const updateCardConfig = (field: keyof BirthdayCardConfig, value: string) => {
     setCardConfig(prev => ({ ...prev, [field]: value }));
     setShareFeedback('');
@@ -271,6 +284,7 @@ function App() {
                     <li>Add a photo URL for the birthday image.</li>
                     <li>Generate a link and send it to your friend.</li>
                     <li>They pop all balloons to unlock your surprise message 🎉</li>
+                    <li>This game works best on desktop for the smoothest experience.</li>
                   </ol>
                 </div>
               )}
@@ -349,12 +363,23 @@ function App() {
                 </div>
               )}
 
-              <button
-                onClick={startGame}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-12 py-5 rounded-full font-bold text-xl shadow-xl shadow-primary/20 transition-all active:scale-95"
-              >
-                Start Popping!
-              </button>
+              <div className="flex flex-col items-center gap-3">
+                <button
+                  onClick={startGame}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-12 py-5 rounded-full font-bold text-xl shadow-xl shadow-primary/20 transition-all active:scale-95"
+                >
+                  Start Popping!
+                </button>
+
+                {!isSharedView && (
+                  <button
+                    onClick={playExampleGame}
+                    className="bg-white/80 hover:bg-white text-foreground px-8 py-3 rounded-full font-semibold border border-primary/20 shadow transition-all active:scale-95"
+                  >
+                    Play Example Game
+                  </button>
+                )}
+              </div>
             </motion.div>
           </div>
         ) : isCelebration ? (
