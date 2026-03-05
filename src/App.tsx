@@ -286,6 +286,13 @@ function App() {
                     <li>They pop all balloons to unlock your surprise message 🎉</li>
                     <li>This game works best on desktop for the smoothest experience.</li>
                   </ol>
+
+                  <button
+                    onClick={playExampleGame}
+                    className="mt-4 bg-white/80 hover:bg-white text-foreground px-8 py-3 rounded-full font-semibold border border-primary/20 shadow transition-all active:scale-95"
+                  >
+                    Play Example Game
+                  </button>
                 </div>
               )}
 
@@ -370,15 +377,6 @@ function App() {
                 >
                   Start Popping!
                 </button>
-
-                {!isSharedView && (
-                  <button
-                    onClick={playExampleGame}
-                    className="bg-white/80 hover:bg-white text-foreground px-8 py-3 rounded-full font-semibold border border-primary/20 shadow transition-all active:scale-95"
-                  >
-                    Play Example Game
-                  </button>
-                )}
               </div>
             </motion.div>
           </div>
