@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://birthday-bash.app/sitemap.xml

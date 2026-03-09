@@ -1,0 +1,16 @@
+{
+  "name": "Balloon Bash",
+  "short_name": "Balloon Bash",
+  "description": "Create and share a personalized birthday balloon popping surprise.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f7ff",
+  "theme_color": "#f8f7ff",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
